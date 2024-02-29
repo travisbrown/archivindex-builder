@@ -1,0 +1,19 @@
+[package]
+name = "aib-downloader"
+version = "0.1.0"
+authors = ["Travis Brown <travisrobertbrown@gmail.com>"]
+repository = "https://github.com/travisbrown/archivindex-builder"
+edition = "2021"
+license = "AGPL-3.0-only"
+
+[dependencies]
+bytes = { workspace = true }
+chrono = { workspace = true }
+futures = { workspace = true }
+log = { workspace = true }
+once_cell = { workspace = true }
+regex = { workspace = true }
+reqwest = { workspace = true }
+thiserror = { workspace = true }
+tokio-retry = "0.3"
+aib-core = { path = "../core/" }

@@ -1,0 +1,12 @@
+{
+  "db_name": "SQLite",
+  "query": "INSERT OR IGNORE INTO snapshot_link(snapshot_id, link_id) VALUES (?, ?)",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Right": 2
+    },
+    "nullable": []
+  },
+  "hash": "2f53532ab2d0a2a214acefa382f9d46cef65bfbdc758dae4a1bed1f0db06912a"
+}

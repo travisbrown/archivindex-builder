@@ -1,0 +1,20 @@
+{
+  "db_name": "SQLite",
+  "query": "INSERT INTO pattern(surt, prefix, name, slug, sort_id)\n            VALUES (?, ?, ?, ?, ?) ON CONFLICT DO UPDATE SET id = id RETURNING id",
+  "describe": {
+    "columns": [
+      {
+        "name": "id",
+        "ordinal": 0,
+        "type_info": "Int64"
+      }
+    ],
+    "parameters": {
+      "Right": 5
+    },
+    "nullable": [
+      false
+    ]
+  },
+  "hash": "8e89e70523d6cdd4e11346dc6360c4a524c5deb381737674b6b73c94896ce606"
+}

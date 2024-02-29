@@ -1,0 +1,6 @@
+Rocket.toml
+Cargo.lock
+target/
+tmp/
+auth-sqlx/data/
+manager/data/

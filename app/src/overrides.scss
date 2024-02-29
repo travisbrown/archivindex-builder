@@ -1,0 +1,49 @@
+@import "~bulma/bulma.sass";
+
+body button.important_style {
+    background-image: none;
+    background-color: #3e8ed0 !important;
+    color: white !important;
+
+    @extend .is-info;
+    @extend .button;
+}
+
+.sui-layout-main-header__inner {
+    margin-bottom: 1em;
+}
+
+.sui-result__header h3 {
+    font-weight: bold;
+}
+
+.result-header {
+    margin: 0em 1.5em;
+    padding-bottom: 0.5em;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.result-header h3 {
+    font-weight: bold;
+}
+
+.result-header h4 {
+    color: gray;
+}
+
+.sui-result__body {
+    margin: 0em 1em 0em 1em;
+}
+
+.sui-result__body h4 {
+    font-weight: bold;
+}
+
+.sui-result__body ol li {
+    margin: 1em 0.5em 0em 0.5em;
+    list-style: none;
+}
+
+.sui-result__body a {
+    color: #3e8ed0 !important;
+}

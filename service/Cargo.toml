@@ -1,0 +1,26 @@
+[package]
+name = "aib-service"
+version = "0.1.0"
+authors = ["Travis Brown <travisrobertbrown@gmail.com>"]
+repository = "https://github.com/travisbrown/archivindex-builder"
+edition = "2021"
+license = "AGPL-3.0-only"
+
+[dependencies]
+aib-auth = { path = "../auth/" }
+aib-auth-sqlx = { path = "../auth-sqlx/" }
+aib-core = { path = "../core/" }
+aib-indexer = { path = "../indexer/" }
+aib-manager = { path = "../manager/" }
+chrono = { workspace = true }
+indexmap = { workspace = true }
+log = { workspace = true }
+rocket = { version = "0.5.0", features = ["json"] }
+rocket_cors = "0.6"
+rocket_oauth2 = "0.5.0"
+rocket_db_pools = { version = "0.1.0", features = ["sqlx_sqlite"] }
+serde = { workspace = true }
+serde_json = { workspace = true }
+sqlx = { workspace = true }
+thiserror = { workspace = true }
+tokio = { workspace = true }

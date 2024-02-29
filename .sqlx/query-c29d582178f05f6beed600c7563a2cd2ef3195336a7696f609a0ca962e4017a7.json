@@ -1,0 +1,12 @@
+{
+  "db_name": "SQLite",
+  "query": "INSERT OR IGNORE INTO pattern_entry(pattern_id, entry_id) VALUES (?, ?)",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Right": 2
+    },
+    "nullable": []
+  },
+  "hash": "c29d582178f05f6beed600c7563a2cd2ef3195336a7696f609a0ca962e4017a7"
+}

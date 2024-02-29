@@ -1,0 +1,9 @@
+DROP TABLE pattern;
+DROP TABLE entry;
+DROP TABLE surt;
+DROP TABLE snapshot;
+DROP TABLE entry_success;
+DROP TABLE entry_failure;
+DROP TABLE link;
+DROP TABLE pattern_entry;
+DROP TABLE snapshot_link;

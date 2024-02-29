@@ -1,0 +1,20 @@
+{
+  "db_name": "SQLite",
+  "query": "INSERT INTO entry_success(entry_id, snapshot_id, correct_digest, ts) VALUES (?, ?, ?, ?)\n            ON CONFLICT DO UPDATE SET id = id RETURNING id",
+  "describe": {
+    "columns": [
+      {
+        "name": "id",
+        "ordinal": 0,
+        "type_info": "Int64"
+      }
+    ],
+    "parameters": {
+      "Right": 4
+    },
+    "nullable": [
+      false
+    ]
+  },
+  "hash": "5f8bee48ef39cc4b47fc68791b22f7fdd766f7b4be8a5ef8dc72c19ab33c904a"
+}

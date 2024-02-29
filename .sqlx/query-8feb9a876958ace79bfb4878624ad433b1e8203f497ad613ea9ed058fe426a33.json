@@ -1,0 +1,20 @@
+{
+  "db_name": "SQLite",
+  "query": "INSERT INTO snapshot(digest)\n            VALUES (?) ON CONFLICT DO UPDATE SET id = id RETURNING id",
+  "describe": {
+    "columns": [
+      {
+        "name": "id",
+        "ordinal": 0,
+        "type_info": "Int64"
+      }
+    ],
+    "parameters": {
+      "Right": 1
+    },
+    "nullable": [
+      false
+    ]
+  },
+  "hash": "8feb9a876958ace79bfb4878624ad433b1e8203f497ad613ea9ed058fe426a33"
+}

@@ -1,0 +1,68 @@
+{
+  "db_name": "SQLite",
+  "query": "SELECT\n                surt.id AS id,\n                url,\n                surt.id AS surt_id,\n                surt.value AS surt,\n                ts,\n                digest,\n                mime_type,\n                status_code,\n                length\n            FROM entry\n            JOIN surt ON surt.id = entry.surt_id\n            WHERE digest = ?\n            ",
+  "describe": {
+    "columns": [
+      {
+        "name": "id",
+        "ordinal": 0,
+        "type_info": "Int64"
+      },
+      {
+        "name": "url",
+        "ordinal": 1,
+        "type_info": "Text"
+      },
+      {
+        "name": "surt_id",
+        "ordinal": 2,
+        "type_info": "Int64"
+      },
+      {
+        "name": "surt",
+        "ordinal": 3,
+        "type_info": "Text"
+      },
+      {
+        "name": "ts",
+        "ordinal": 4,
+        "type_info": "Int64"
+      },
+      {
+        "name": "digest",
+        "ordinal": 5,
+        "type_info": "Text"
+      },
+      {
+        "name": "mime_type",
+        "ordinal": 6,
+        "type_info": "Text"
+      },
+      {
+        "name": "status_code",
+        "ordinal": 7,
+        "type_info": "Int64"
+      },
+      {
+        "name": "length",
+        "ordinal": 8,
+        "type_info": "Int64"
+      }
+    ],
+    "parameters": {
+      "Right": 1
+    },
+    "nullable": [
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      true,
+      false
+    ]
+  },
+  "hash": "3c0eb12034d815622d31a320057f5c78361dfdcb47aa9c877ff9edd965314ff4"
+}

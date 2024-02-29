@@ -1,0 +1,44 @@
+{
+  "db_name": "SQLite",
+  "query": "SELECT\n                snapshot.id AS snapshot_id,\n                entry.surt_id AS surt_id,\n                snapshot.digest AS digest,\n                pattern.slug AS pattern_slug,\n                entry.ts AS timestamp\n            FROM snapshot\n            JOIN entry_success ON entry_success.snapshot_id = snapshot.id\n            JOIN entry ON entry.id = entry_success.entry_id\n            JOIN pattern_entry ON pattern_entry.entry_id = entry.id\n            JOIN pattern on pattern.id = pattern_entry.pattern_id\n            WHERE entry.mime_type = ?\n            ORDER BY snapshot_id, timestamp\n            ",
+  "describe": {
+    "columns": [
+      {
+        "name": "snapshot_id",
+        "ordinal": 0,
+        "type_info": "Int64"
+      },
+      {
+        "name": "surt_id",
+        "ordinal": 1,
+        "type_info": "Int64"
+      },
+      {
+        "name": "digest",
+        "ordinal": 2,
+        "type_info": "Text"
+      },
+      {
+        "name": "pattern_slug",
+        "ordinal": 3,
+        "type_info": "Text"
+      },
+      {
+        "name": "timestamp",
+        "ordinal": 4,
+        "type_info": "Int64"
+      }
+    ],
+    "parameters": {
+      "Right": 1
+    },
+    "nullable": [
+      false,
+      false,
+      false,
+      false,
+      false
+    ]
+  },
+  "hash": "6aa414811c13afe75bcfc36baed5f1d7c92ca587791d50d6a2269a45b0880561"
+}
