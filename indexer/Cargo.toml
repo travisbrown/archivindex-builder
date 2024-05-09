@@ -15,5 +15,4 @@ once_cell = { workspace = true }
 serde = { workspace = true }
 tantivy = "0.22"
 thiserror = { workspace = true }
-aib-core = { path = "../core/" }
 aib-extractor = { path = "../extractor/" }

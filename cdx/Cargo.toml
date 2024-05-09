@@ -8,7 +8,6 @@ license = "AGPL-3.0-only"
 
 [dependencies]
 chrono = { workspace = true }
-cli-helpers = { workspace = true }
 futures = { workspace = true }
 reqwest = { workspace = true }
 serde = { workspace = true }

@@ -8,13 +8,10 @@ license = "AGPL-3.0-only"
 
 [dependencies]
 cli-helpers = { workspace = true }
-csv = { workspace = true }
 data-encoding = "2.3"
-flate2 = "1.0"
 lazy_static = { workspace = true }
 regex = { workspace = true }
 sha-1 = "0.10"
-tempfile = "3"
 thiserror = { workspace = true }
 tokio = { workspace = true }
 aib-core = { path = "../core/" }

@@ -14,12 +14,13 @@ cli-helpers = { workspace = true }
 data-encoding = "2.3"
 flate2 = "1"
 futures = { workspace = true }
-itertools = "0.12"
 lazy_static = { workspace = true }
 regex = { workspace = true }
 serde = { workspace = true }
 thiserror = { workspace = true }
 tokio = { workspace = true }
+zstd = { workspace = true }
+
+[dev-dependencies]
 tokio-test = "0.4"
 toml = { workspace = true }
-zstd = { workspace = true }
