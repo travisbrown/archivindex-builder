@@ -9,7 +9,7 @@ use tantivy::{
     directory::MmapDirectory,
     doc,
     query::{BooleanQuery, Occur, QueryParser, RangeQuery, TermQuery, TermSetQuery},
-    schema::{Facet, IndexRecordOption, Term},
+    schema::{Facet, IndexRecordOption, Term, Value},
     DocAddress, IndexReader, IndexWriter, SnippetGenerator,
 };
 
@@ -86,7 +86,7 @@ impl Index {
         let writer = index.writer(WRITER_BUFFER_SIZE)?;
         let reader = index
             .reader_builder()
-            .reload_policy(tantivy::ReloadPolicy::OnCommit)
+            .reload_policy(tantivy::ReloadPolicy::OnCommitWithDelay)
             .try_into()?;
         let query_parser =
             QueryParser::for_index(&index, vec![schema.fields.title, schema.fields.content]);
@@ -117,7 +117,7 @@ impl Index {
         for (segment_ord, segment_reader) in searcher.segment_readers().iter().enumerate() {
             for doc_id in segment_reader.doc_ids_alive() {
                 let doc_address = DocAddress::new(segment_ord as u32, doc_id);
-                let doc = searcher.doc(doc_address)?;
+                let doc: tantivy::schema::document::TantivyDocument = searcher.doc(doc_address)?;
                 let surt_id = doc
                     .get_first(self.schema.fields.surt_id)
                     .and_then(|field| field.as_i64())
@@ -241,7 +241,8 @@ impl Index {
                 let hits = docs
                     .into_iter()
                     .map(|(score, address)| {
-                        let retrieved_document = searcher.doc(address)?;
+                        let retrieved_document: tantivy::schema::document::TantivyDocument =
+                            searcher.doc(address)?;
                         let snippet = snippet_generator.snippet_from_doc(&retrieved_document);
 
                         let snapshot_id = retrieved_document
@@ -262,7 +263,7 @@ impl Index {
                                 .ok_or_else(|| Error::MissingPattern(address))?;
                             let title = retrieved_document
                                 .get_first(self.schema.fields.title)
-                                .and_then(|field| field.as_text())
+                                .and_then(|field| field.as_str())
                                 .ok_or_else(|| Error::MissingTitle(address))?
                                 .to_string();
                             Ok(SearchHit {
