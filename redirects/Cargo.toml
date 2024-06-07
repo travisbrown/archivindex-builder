@@ -9,7 +9,7 @@ license = { workspace = true }
 [dependencies]
 cli-helpers = { workspace = true }
 data-encoding = "2.3"
-lazy_static = { workspace = true }
+once_cell = { workspace = true }
 regex = { workspace = true }
 sha-1 = "0.10"
 thiserror = { workspace = true }

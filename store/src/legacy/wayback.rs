@@ -1,7 +1,7 @@
 use aib_core::digest::{compute_digest, Sha1Digest};
 use flate2::read::GzDecoder;
 use futures::{FutureExt, Stream, TryStreamExt};
-use lazy_static::lazy_static;
+use once_cell::sync::Lazy;
 use std::collections::HashSet;
 use std::fs::{read_dir, DirEntry, File};
 use std::io::{self, BufReader, Read};
@@ -24,14 +24,12 @@ pub enum Error {
     Digest(#[from] aib_core::digest::Error),
 }
 
-lazy_static! {
-    static ref NAMES: HashSet<String> = {
-        let mut names = HashSet::new();
-        names.extend(('2'..='7').map(|c| c.to_string()));
-        names.extend(('A'..='Z').map(|c| c.to_string()));
-        names
-    };
-}
+static NAMES: Lazy<HashSet<String>> = Lazy::new(|| {
+    let mut names = HashSet::new();
+    names.extend(('2'..='7').map(|c| c.to_string()));
+    names.extend(('A'..='Z').map(|c| c.to_string()));
+    names
+});
 
 fn is_valid_char(c: char) -> bool {
     ('2'..='7').contains(&c) || c.is_ascii_uppercase()

@@ -1,8 +1,6 @@
 use aib_core::digest::{compute_digest, Sha1Digest};
 use flate2::bufread::GzDecoder;
 use futures::{FutureExt, Stream, TryStreamExt};
-use lazy_static::lazy_static;
-use std::collections::HashSet;
 use std::fs::File;
 use std::io::{BufReader, Read};
 use std::path::{Path, PathBuf};
@@ -45,15 +43,6 @@ pub enum Error {
     },
     #[error("Validation I/O error")]
     ValidationIo { entry: Entry, error: std::io::Error },
-}
-
-lazy_static! {
-    static ref NAMES: HashSet<String> = {
-        let mut names = HashSet::new();
-        names.extend(('2'..='7').map(|c| c.to_string()));
-        names.extend(('A'..='Z').map(|c| c.to_string()));
-        names
-    };
 }
 
 fn is_valid_char(c: char) -> bool {
