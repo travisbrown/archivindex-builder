@@ -33,7 +33,7 @@ impl From<aib_manager::search::SearchResult> for SearchResult {
                         *title_entry += 1;
 
                         snapshots.push(SnapshotResult {
-                            timestamp: timestamp.0,
+                            timestamp: timestamp.into(),
                             score: hit.score,
                             url: hit.url.to_wb_url(true, false),
                             title: hit.title,
@@ -41,7 +41,7 @@ impl From<aib_manager::search::SearchResult> for SearchResult {
                         });
                     }
 
-                    scores.insert(timestamp.0.timestamp() as u64, score);
+                    scores.insert(i64::from(timestamp) as u64, score);
                 }
 
                 let title = title_counts

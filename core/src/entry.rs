@@ -65,7 +65,7 @@ mod tests {
     use super::*;
 
     #[test]
-    fn test_parse() {
+    fn parse() {
         let url = "https://web.archive.org/web/20160508215503/https://twitter.com/roman_dmowski99/status/725877225686454272";
         let expected = UrlParts::new(
             "https://twitter.com/roman_dmowski99/status/725877225686454272".to_string(),

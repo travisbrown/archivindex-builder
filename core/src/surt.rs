@@ -17,6 +17,9 @@ pub enum Error {
     UnexpectedUrl(String),
 }
 
+/// Simplified Sort-friendly URI Reordering Transform representation.
+///
+/// Currently only implements features necessary to handle Wayback Machine CDX results.
 #[derive(Clone, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
 pub struct Surt {
     pub domain: Vec<String>,
@@ -127,7 +130,6 @@ impl Serialize for Surt {
     where
         S: Serializer,
     {
-        //serializer.serialize_str(&SurtCanonicalUrl { source: self }.to_string())
         serializer.serialize_str(&self.to_string())
     }
 }

@@ -18,10 +18,9 @@ pub enum Error {
     InvalidTimestamp(i64),
 }
 
+/// Represents a Wayback Machine URL timestamp.
 #[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
-pub struct Timestamp(pub DateTime<Utc>);
-
-impl Timestamp {}
+pub struct Timestamp(DateTime<Utc>);
 
 impl Display for Timestamp {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
@@ -35,12 +34,24 @@ impl From<DateTime<Utc>> for Timestamp {
     }
 }
 
+impl From<Timestamp> for DateTime<Utc> {
+    fn from(value: Timestamp) -> Self {
+        value.0
+    }
+}
+
 impl TryFrom<i64> for Timestamp {
     type Error = Error;
     fn try_from(value: i64) -> Result<Self, Self::Error> {
         Ok(Self(
             DateTime::from_timestamp(value, 0).ok_or(Error::InvalidTimestamp(value))?,
         ))
+    }
+}
+
+impl From<Timestamp> for i64 {
+    fn from(value: Timestamp) -> Self {
+        DateTime::<Utc>::from(value).timestamp()
     }
 }
 

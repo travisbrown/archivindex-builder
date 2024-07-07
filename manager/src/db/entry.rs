@@ -19,7 +19,7 @@ pub async fn insert_entry<'c, E: Executor<'c, Database = Sqlite>>(
     surt_id: u64,
 ) -> Result<u64, sqlx::Error> {
     let surt_id = surt_id as i64;
-    let timestamp = entry.timestamp.0.timestamp();
+    let timestamp: i64 = entry.timestamp.into();
     let digest = entry.digest.to_string();
     let mime_type = entry.mime_type.to_string();
     let status_code = entry.status_code.map(|value| value as i32);
@@ -196,7 +196,7 @@ mod tests {
             &mut *connection,
             &CdxEntry {
                 key: surt.clone(),
-                timestamp: aib_core::timestamp::Timestamp(now_0),
+                timestamp: now_0.into(),
                 original: url.to_string(),
                 mime_type: "text/html".parse().unwrap(),
                 status_code: Some(200),
@@ -210,7 +210,7 @@ mod tests {
             &mut *connection,
             &CdxEntry {
                 key: surt.clone(),
-                timestamp: aib_core::timestamp::Timestamp(now_1),
+                timestamp: now_1.into(),
                 original: url.to_string(),
                 mime_type: "text/html".parse().unwrap(),
                 status_code: Some(200),
@@ -224,7 +224,7 @@ mod tests {
             &mut *connection,
             &CdxEntry {
                 key: surt.clone(),
-                timestamp: aib_core::timestamp::Timestamp(now_0),
+                timestamp: now_0.into(),
                 original: url.to_string(),
                 mime_type: "text/html".parse().unwrap(),
                 status_code: Some(404),

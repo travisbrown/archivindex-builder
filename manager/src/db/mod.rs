@@ -103,10 +103,9 @@ impl<'a> Db<'a> {
         for row in rows {
             let surt_id = row.get::<i64, _>("surt_id");
             let timestamp = row.get::<i64, _>("ts");
-            let timestamp = Timestamp(
-                DateTime::from_timestamp(timestamp, 0)
-                    .ok_or_else(|| Error::InvalidTimestamp(timestamp))?,
-            );
+            let timestamp = DateTime::from_timestamp(timestamp, 0)
+                .ok_or_else(|| Error::InvalidTimestamp(timestamp))?
+                .into();
 
             let entry = results.entry(surt_id).or_default();
             entry.push(timestamp);
@@ -158,10 +157,9 @@ impl<'a> Db<'a> {
                     snapshot_id,
                     UrlParts::new(
                         url,
-                        Timestamp(
-                            DateTime::from_timestamp(timestamp, 0)
-                                .ok_or_else(|| Error::InvalidTimestamp(timestamp))?,
-                        ),
+                        DateTime::from_timestamp(timestamp, 0)
+                            .ok_or_else(|| Error::InvalidTimestamp(timestamp))?
+                            .into(),
                     ),
                     model::Surt {
                         id: surt_id,

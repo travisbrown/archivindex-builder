@@ -19,18 +19,16 @@ impl Entry {
     pub fn url_parts(&self) -> Result<UrlParts, super::Error> {
         Ok(UrlParts::new(
             self.url.clone(),
-            Timestamp(
-                DateTime::from_timestamp(self.ts, 0)
-                    .ok_or_else(|| super::Error::InvalidTimestamp(self.ts))?,
-            ),
+            DateTime::from_timestamp(self.ts, 0)
+                .ok_or_else(|| super::Error::InvalidTimestamp(self.ts))?
+                .into(),
         ))
     }
 
     pub fn timestamp(&self) -> Result<Timestamp, super::Error> {
-        Ok(Timestamp(
-            DateTime::from_timestamp(self.ts, 0)
-                .ok_or_else(|| super::Error::InvalidTimestamp(self.ts))?,
-        ))
+        Ok(DateTime::from_timestamp(self.ts, 0)
+            .ok_or_else(|| super::Error::InvalidTimestamp(self.ts))?
+            .into())
     }
 
     pub fn digest(&self) -> Result<Sha1Digest, super::Error> {
