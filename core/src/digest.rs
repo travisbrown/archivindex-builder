@@ -97,6 +97,13 @@ impl Digest {
             Self::Invalid(digest) => Some(digest),
         }
     }
+
+    pub fn is_valid(&self) -> bool {
+        match self {
+            Self::Valid(_) => true,
+            Self::Invalid(_) => false,
+        }
+    }
 }
 
 impl FromStr for Digest {
@@ -234,12 +241,34 @@ impl Serialize for Sha1Digest {
 #[cfg(test)]
 mod tests {
     #[test]
-    fn round_trip() {
+    fn round_trip_sha1_digest() {
         let digest_str = "ZHYT52YPEOCHJD5FZINSDYXGQZI22WJ4";
 
         let digest: super::Sha1Digest = digest_str.parse().unwrap();
         let digest_string = digest.to_string();
 
+        assert_eq!(digest_str, digest_string);
+    }
+
+    #[test]
+    fn round_trip_digest_valid() {
+        let digest_str = "ZHYT52YPEOCHJD5FZINSDYXGQZI22WJ4";
+
+        let digest: super::Digest = digest_str.parse().unwrap();
+        let digest_string = digest.to_string();
+
+        assert!(digest.is_valid());
+        assert_eq!(digest_str, digest_string);
+    }
+
+    #[test]
+    fn round_trip_digest_invalid() {
+        let digest_str = "HYT52YPEOCHJD5FZINSDYXGQZI22WJ4";
+
+        let digest: super::Digest = digest_str.parse().unwrap();
+        let digest_string = digest.to_string();
+
+        assert!(!digest.is_valid());
         assert_eq!(digest_str, digest_string);
     }
 }
