@@ -4,9 +4,10 @@ use aib_core::{
     timestamp::Timestamp,
 };
 use cli_helpers::prelude::*;
-use std::fs::File;
+use std::fs::{File, OpenOptions};
 use std::io::{Cursor, Write};
 use std::path::PathBuf;
+use std::time::Duration;
 
 /// Invalid digest for a CDX entry.
 #[derive(Clone, Debug, serde::Deserialize, Eq, PartialEq, Ord, PartialOrd, serde::Serialize)]
@@ -33,9 +34,12 @@ async fn main() -> Result<(), Error> {
 
     std::fs::create_dir_all(&output_data_dir)?;
 
-    let mut invalid_digests = csv::WriterBuilder::new()
-        .has_headers(false)
-        .from_writer(File::create(output_invalid_digests_file)?);
+    let mut invalid_digests = csv::WriterBuilder::new().has_headers(false).from_writer(
+        OpenOptions::new()
+            .write(true)
+            .append(true)
+            .open(output_invalid_digests_file)?,
+    );
 
     let downloader = aib_downloader::Downloader::default();
     let sha1_computer = Sha1Computer::default();
@@ -47,31 +51,38 @@ async fn main() -> Result<(), Error> {
     {
         log::info!("Downloading {} ({})", url, timestamp);
 
-        if let Some(result) = downloader.download(&url, timestamp, true).await? {
-            for redirect in result.redirects {
-                log::warn!("Redirecting: {} ({}) to {}", url, timestamp, redirect.url);
+        match downloader.download(&url, timestamp, true).await {
+            Ok(Some(result)) => {
+                for redirect in result.redirects {
+                    log::warn!("Redirecting: {} ({}) to {}", url, timestamp, redirect.url);
+                }
+
+                let digest = sha1_computer.digest(&mut Cursor::new(&result.bytes))?;
+
+                if Digest::Valid(digest) != expected_digest {
+                    log::warn!("Invalid digest: {} instead of {}", digest, expected_digest);
+
+                    invalid_digests.serialize(InvalidDigest {
+                        url: url.clone(),
+                        timestamp,
+                        expected: expected_digest,
+                        actual: digest,
+                    })?;
+                    invalid_digests.flush()?;
+                }
+
+                log::info!("Saving {}", digest);
+
+                let mut file = File::create(output_data_dir.join(digest.to_string()))?;
+                file.write_all(&result.bytes)?;
             }
-
-            let digest = sha1_computer.digest(&mut Cursor::new(&result.bytes))?;
-
-            if Digest::Valid(digest) != expected_digest {
-                log::warn!("Invalid digest: {} instead of {}", digest, expected_digest);
-
-                invalid_digests.serialize(InvalidDigest {
-                    url: url.clone(),
-                    timestamp,
-                    expected: expected_digest,
-                    actual: digest,
-                })?;
-                invalid_digests.flush()?;
+            Ok(None) => {
+                log::warn!("Skipped: {} ({})", url, timestamp);
             }
-
-            log::info!("Saving {}", digest);
-
-            let mut file = File::create(output_data_dir.join(digest.to_string()))?;
-            file.write_all(&result.bytes)?;
-        } else {
-            log::warn!("Skipped: {} ({})", url, timestamp);
+            Err(error) => {
+                log::error!("Error: {}", error);
+                tokio::time::sleep(Duration::from_secs(30)).await;
+            }
         }
     }
 
