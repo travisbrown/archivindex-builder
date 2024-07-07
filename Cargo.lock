@@ -170,7 +170,7 @@ dependencies = [
  "once_cell",
  "regex",
  "serde",
- "sha-1 0.10.1",
+ "sha1",
  "thiserror",
  "url",
 ]
