@@ -15,12 +15,20 @@ data-encoding = "2.3"
 flate2 = "1"
 futures = { workspace = true }
 once_cell = { workspace = true }
+parquet = "52"
+parquetry = { git = "https://github.com/travisbrown/parquetry.git", branch = "topic/writer" }
 regex = { workspace = true }
 serde = { workspace = true }
 thiserror = { workspace = true }
 tokio = { workspace = true }
 zstd = { workspace = true }
 
+[build-dependencies]
+parquetry-gen = { git = "https://github.com/travisbrown/parquetry.git", branch = "topic/writer" }
+
 [dev-dependencies]
+bincode = { version = "2.0.0-rc.3", features = ["serde"] }
+quickcheck = "1"
+tempdir = "0.3"
 tokio-test = "0.4"
 toml = { workspace = true }

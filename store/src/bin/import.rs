@@ -1,5 +1,7 @@
+use aib_core::digest::Sha1Digest;
 use cli_helpers::prelude::*;
 use futures::stream::TryStreamExt;
+use parquetry::Schema;
 use std::fs::File;
 use std::path::PathBuf;
 
@@ -79,6 +81,85 @@ async fn main() -> Result<(), Error> {
                 })
                 .await?;
         }
+        Command::Parquetify {
+            input,
+            output,
+            level,
+        } => {
+            use aib_store::item::{columns, Item};
+            use parquet::file::properties::WriterProperties;
+            use parquetry::Schema;
+            let store = aib_store::items::ItemStore::new(input, level);
+            let mut file = std::fs::File::create(&output)?;
+            let properties = WriterProperties::builder()
+                .set_writer_version(parquet::file::properties::WriterVersion::PARQUET_2_0)
+                .set_sorting_columns(Some(vec![columns::DIGEST.sorting()]))
+                .set_column_dictionary_enabled(columns::DIGEST.path(), false)
+                .set_column_dictionary_enabled(columns::CONTENT.path(), false)
+                .set_column_encoding(
+                    columns::DIGEST.path(),
+                    parquet::basic::Encoding::DELTA_BYTE_ARRAY,
+                )
+                .set_column_bloom_filter_enabled(columns::DIGEST.path(), true)
+                .set_column_encoding(
+                    columns::CONTENT.path(),
+                    parquet::basic::Encoding::DELTA_LENGTH_BYTE_ARRAY,
+                )
+                .set_column_compression(
+                    columns::CONTENT.path(),
+                    parquet::basic::Compression::ZSTD(parquet::basic::ZstdLevel::try_new(
+                        level.unwrap_or_default(),
+                    )?),
+                )
+                .set_column_statistics_enabled(
+                    columns::CONTENT.path(),
+                    parquet::file::properties::EnabledStatistics::None,
+                )
+                .build();
+
+            let mut files = store
+                .entries(4)
+                .and_then(|entry| async {
+                    let entry = entry.unwrap();
+                    //let bytes = zstd::stream::decode_all(File::open(entry.path)?)?;
+                    //let item = Item::new(entry.digest.0, bytes).unwrap();
+                    Ok(entry)
+                })
+                .try_collect::<Vec<_>>()
+                .await?;
+
+            files.sort_by_key(|entry| entry.digest);
+
+            let groups = files.chunks(10000).map(|entries| {
+                entries
+                    .iter()
+                    .map(|entry| {
+                        let bytes =
+                            zstd::stream::decode_all(File::open(&entry.path).unwrap()).unwrap();
+                        let item = Item::new(entry.digest.0, bytes).unwrap();
+                        item
+                    })
+                    .collect::<Vec<_>>()
+            });
+
+            let data = Item::write(file, properties, groups)?;
+
+            println!("{:?}", data);
+        }
+        Command::ParquetDump { input } => {
+            /*use aib_store::item::Item;
+            use parquet::file::serialized_reader::ReadOptionsBuilder;
+
+            for item in Item::read(File::open(input)?, ReadOptionsBuilder::new().build()) {
+                let item = item?;
+                let digest = Sha1Digest(item.digest);
+                let content = std::str::from_utf8(&item.content).unwrap();
+
+                println!("{}: {}", digest, &content[0..10]);
+            }*/
+
+            aib_store::parquet::read_parquet(File::open(input)?).unwrap();
+        }
     }
 
     Ok(())
@@ -96,6 +177,10 @@ pub enum Error {
     Store(#[from] aib_store::Error),
     #[error("Item store error")]
     ItemStore(#[from] aib_store::items::Error),
+    #[error("Parquet error")]
+    Parquet(#[from] parquet::errors::ParquetError),
+    #[error("Parquetry error")]
+    Parquetry(#[from] parquetry::error::Error),
 }
 
 #[derive(Debug, Parser)]
@@ -136,5 +221,17 @@ enum Command {
         input: PathBuf,
         #[clap(long)]
         level: Option<i32>,
+    },
+    Parquetify {
+        #[clap(long)]
+        input: PathBuf,
+        #[clap(long)]
+        output: PathBuf,
+        #[clap(long)]
+        level: Option<i32>,
+    },
+    ParquetDump {
+        #[clap(long)]
+        input: PathBuf,
     },
 }
