@@ -15,7 +15,7 @@ data-encoding = "2.3"
 flate2 = "1"
 futures = { workspace = true }
 once_cell = { workspace = true }
-parquet = "52"
+parquet = "53"
 parquetry = { git = "https://github.com/travisbrown/parquetry.git", branch = "topic/writer" }
 regex = { workspace = true }
 serde = { workspace = true }

@@ -12,7 +12,7 @@ chrono = { workspace = true }
 egg-mode = "0.16"
 flagset = "0.4"
 futures = { workspace = true }
-openid = "0.14"
+openid = "0.15"
 parking_lot = "0.12"
 reqwest = { workspace = true }
 serde = { workspace = true }
