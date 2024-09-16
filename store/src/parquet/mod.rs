@@ -6,6 +6,8 @@ use parquet::{
     },
 };
 
+pub mod item;
+
 pub fn read_parquet<R: ChunkReader + 'static>(file: R) -> Result<(), Box<dyn std::error::Error>> {
     let reader = SerializedFileReader::new(file)?;
 

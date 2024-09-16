@@ -2425,7 +2425,7 @@ dependencies = [
 [[package]]
 name = "parquetry"
 version = "0.11.0"
-source = "git+https://github.com/travisbrown/parquetry.git?branch=topic/writer#d0503c989017f1a5c0f534d5a237a20a824d172b"
+source = "git+https://github.com/travisbrown/parquetry.git?branch=topic/writer#c7c321b7e928694cf8ac3ebabce90da4ad4d9814"
 dependencies = [
  "chrono",
  "parquet",
@@ -2435,7 +2435,7 @@ dependencies = [
 [[package]]
 name = "parquetry-gen"
 version = "0.11.0"
-source = "git+https://github.com/travisbrown/parquetry.git?branch=topic/writer#d0503c989017f1a5c0f534d5a237a20a824d172b"
+source = "git+https://github.com/travisbrown/parquetry.git?branch=topic/writer#c7c321b7e928694cf8ac3ebabce90da4ad4d9814"
 dependencies = [
  "codegen",
  "convert_case 0.6.0",

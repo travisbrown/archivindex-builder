@@ -7,7 +7,7 @@ fn main() -> Result<(), parquetry_gen::error::Error> {
         Some(".parquet.txt"),
     )? {
         println!("cargo:rerun-if-changed={}", schema.absolute_path_str()?);
-        let mut output = File::create(format!("src/{}.rs", schema.name))?;
+        let mut output = File::create(format!("src/parquet/{}.rs", schema.name))?;
         write!(output, "{}", schema.code()?)?;
     }
 

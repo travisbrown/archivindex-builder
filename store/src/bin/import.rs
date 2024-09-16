@@ -84,7 +84,7 @@ async fn main() -> Result<(), Error> {
             output,
             level,
         } => {
-            use aib_store::item::{columns, Item};
+            use aib_store::parquet::item::{columns, Item};
             use parquet::file::properties::WriterProperties;
             use parquetry::Schema;
             let store = aib_store::items::ItemStore::new(input, level);
@@ -128,19 +128,20 @@ async fn main() -> Result<(), Error> {
 
             files.sort_by_key(|entry| entry.digest);
 
-            let groups = files.chunks(10000).map(|entries| {
-                entries
-                    .iter()
-                    .map(|entry| {
-                        let bytes =
-                            zstd::stream::decode_all(File::open(&entry.path).unwrap()).unwrap();
-                        let item = Item::new(entry.digest.0, bytes).unwrap();
-                        item
-                    })
-                    .collect::<Vec<_>>()
+            let groups = files.into_iter().map(|entry| {
+                let bytes = zstd::stream::decode_all(File::open(&entry.path).unwrap()).unwrap();
+                let item = Item::new(entry.digest.0, bytes).map_err(Error::from);
+                item
             });
 
-            let data = Item::write(file, properties, groups)?;
+            let data = Item::write(
+                file,
+                properties,
+                512 * 1048 * 1048,
+                |item| item.content.len(),
+                false,
+                groups,
+            )?;
 
             println!("{:?}", data);
         }
@@ -179,6 +180,8 @@ pub enum Error {
     Parquet(#[from] parquet::errors::ParquetError),
     #[error("Parquetry error")]
     Parquetry(#[from] parquetry::error::Error),
+    #[error("Parquetry value error")]
+    ParquetryValue(#[from] parquetry::error::ValueError),
 }
 
 #[derive(Debug, Parser)]

@@ -22,7 +22,7 @@ pub mod columns {
         Digest,
         Content,
     }
-    impl parquetry::SortColumn for SortColumn {
+    impl parquetry::sort::SortColumn for SortColumn {
         fn index(&self) -> usize {
             match self {
                 Self::Digest => 0,
@@ -42,7 +42,10 @@ pub mod columns {
 impl parquetry::Schema for Item {
     type SortColumn = columns::SortColumn;
     type Writer<W: std::io::Write + Send> = ItemWriter<W>;
-    fn sort_key_value(&self, sort_key: parquetry::SortKey<Self::SortColumn>) -> Vec<u8> {
+    fn sort_key_value(
+        &self,
+        sort_key: parquetry::sort::SortKey<Self::SortColumn>,
+    ) -> Vec<u8> {
         {
             let mut bytes = vec![];
             for column in sort_key.columns() {
@@ -56,20 +59,6 @@ impl parquetry::Schema for Item {
     }
     fn schema() -> parquet::schema::types::SchemaDescPtr {
         SCHEMA.clone()
-    }
-    fn write<W: std::io::Write + Send, I: IntoIterator<Item = Vec<Self>>>(
-        writer: W,
-        properties: parquet::file::properties::WriterProperties,
-        groups: I,
-    ) -> Result<parquet::format::FileMetaData, parquetry::error::Error> {
-        {
-            use parquetry::SchemaWrite;
-            let mut writer = Self::writer(writer, properties)?;
-            for group in groups {
-                writer.write_group(group.iter())?;
-            }
-            writer.finish()
-        }
     }
     fn writer<W: std::io::Write + Send>(
         writer: W,
@@ -91,18 +80,31 @@ pub struct ItemWriter<W: std::io::Write> {
     writer: parquet::file::writer::SerializedFileWriter<W>,
     workspace: ParquetryWorkspace,
 }
-impl<W: std::io::Write + Send> parquetry::SchemaWrite<Item, W> for ItemWriter<W> {
-    fn write_group<'a, I: Iterator<Item = &'a Item>>(
+impl<W: std::io::Write + Send> parquetry::write::SchemaWrite<Item, W> for ItemWriter<W> {
+    fn write_row_group<
+        'a,
+        E: From<parquetry::error::Error>,
+        I: Iterator<Item = Result<&'a Item, E>>,
+    >(
         &mut self,
-        values: I,
-    ) -> Result<parquet::file::metadata::RowGroupMetaDataPtr, parquetry::error::Error>
+        values: &mut I,
+    ) -> Result<parquet::file::metadata::RowGroupMetaDataPtr, E>
     where
         Item: 'a,
     {
         {
             Item::fill_workspace(&mut self.workspace, values)?;
             Item::write_with_workspace(&mut self.writer, &mut self.workspace)
+                .map_err(E::from)
         }
+    }
+    fn write_item(&mut self, value: &Item) -> Result<(), parquetry::error::Error> {
+        Item::add_item_to_workspace(&mut self.workspace, value)
+    }
+    fn finish_row_group(
+        &mut self,
+    ) -> Result<parquet::file::metadata::RowGroupMetaDataPtr, parquetry::error::Error> {
+        Item::write_with_workspace(&mut self.writer, &mut self.workspace)
     }
     fn finish(self) -> Result<parquet::format::FileMetaData, parquetry::error::Error> {
         Ok(self.writer.close()?)
@@ -149,7 +151,7 @@ impl TryFrom<parquet::record::Row> for Item {
 impl Item {
     fn write_sort_key_bytes(
         &self,
-        column: parquetry::Sort<<Self as parquetry::Schema>::SortColumn>,
+        column: parquetry::sort::Sort<<Self as parquetry::Schema>::SortColumn>,
         bytes: &mut Vec<u8>,
     ) {
         match column.column {
@@ -195,18 +197,29 @@ impl Item {
             Ok(row_group_writer.close()?)
         }
     }
-    fn fill_workspace<'a, I: Iterator<Item = &'a Self>>(
-        workspace: &mut ParquetryWorkspace,
-        group: I,
-    ) -> Result<usize, parquetry::error::Error> {
+    fn fill_workspace<
+        'a,
+        E: From<parquetry::error::Error>,
+        I: Iterator<Item = Result<&'a Self, E>>,
+    >(workspace: &mut ParquetryWorkspace, values: I) -> Result<usize, E> {
         {
-            let mut written_count_ = 0;
-            for Item { digest, content } in group {
-                workspace.values_0000.push(digest.to_vec().into());
-                workspace.values_0001.push(content.as_slice().into());
-                written_count_ += 1;
+            let mut written_count = 0;
+            for result in values {
+                Self::add_item_to_workspace(workspace, result?)?;
+                written_count += 1;
             }
-            Ok(written_count_)
+            Ok(written_count)
+        }
+    }
+    fn add_item_to_workspace(
+        workspace: &mut ParquetryWorkspace,
+        value: &Self,
+    ) -> Result<(), parquetry::error::Error> {
+        {
+            let Item { digest, content } = value;
+            workspace.values_0000.push(digest.to_vec().into());
+            workspace.values_0001.push(content.as_slice().into());
+            Ok(())
         }
     }
 }
@@ -265,7 +278,7 @@ mod test {
         let test_dir = tempdir::TempDir::new("Item-data").unwrap();
         let test_file_path = test_dir.path().join("write-data.parquet");
         let test_file = std::fs::File::create(&test_file_path).unwrap();
-        <super::Item as parquetry::Schema>::write(
+        <super::Item as parquetry::Schema>::write_row_groups(
                 test_file,
                 Default::default(),
                 groups.clone(),
