@@ -11,8 +11,8 @@ members = [
     "manager",
     "redirects",
     "auth",
-    "auth-sqlx",
-    "service",
+    #"auth-sqlx",
+    #"service",
     "downloader-cli",
     "cli"
 ]

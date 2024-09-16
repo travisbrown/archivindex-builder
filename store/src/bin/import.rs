@@ -1,7 +1,5 @@
-use aib_core::digest::Sha1Digest;
 use cli_helpers::prelude::*;
 use futures::stream::TryStreamExt;
-use parquetry::Schema;
 use std::fs::File;
 use std::path::PathBuf;
 
@@ -90,7 +88,7 @@ async fn main() -> Result<(), Error> {
             use parquet::file::properties::WriterProperties;
             use parquetry::Schema;
             let store = aib_store::items::ItemStore::new(input, level);
-            let mut file = std::fs::File::create(&output)?;
+            let file = std::fs::File::create(&output)?;
             let properties = WriterProperties::builder()
                 .set_writer_version(parquet::file::properties::WriterVersion::PARQUET_2_0)
                 .set_sorting_columns(Some(vec![columns::DIGEST.sorting()]))
