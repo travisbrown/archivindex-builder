@@ -157,7 +157,9 @@ async fn main() -> Result<(), Error> {
                 println!("{}: {}", digest, &content[0..10]);
             }*/
 
-            aib_store::parquet::read_parquet(File::open(input)?).unwrap();
+            let total_values = aib_store::parquet::read_parquet(File::open(input)?).unwrap();
+
+            log::info!("Total read: {}", total_values);
         }
     }
 

@@ -25,6 +25,8 @@ pub enum Error {
     InvalidCharacter(String),
     #[error("Invalid SHA-1 digest string input")]
     Invalid(String),
+    #[error("Invalid SHA-1 digest length")]
+    InvalidBytesLength(Vec<u8>),
     #[error("Decoding error")]
     Decoding(data_encoding::DecodePartial),
 }
@@ -199,6 +201,18 @@ impl FromStr for Sha1Digest {
         } else {
             Err(Self::Err::InvalidLength(s.to_string()))
         }
+    }
+}
+
+impl TryFrom<&[u8]> for Sha1Digest {
+    type Error = Error;
+
+    fn try_from(value: &[u8]) -> Result<Self, Self::Error> {
+        Ok(Self(
+            value
+                .try_into()
+                .map_err(|_| Error::InvalidBytesLength(value.to_vec()))?,
+        ))
     }
 }
 
