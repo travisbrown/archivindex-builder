@@ -17,6 +17,7 @@ futures = { workspace = true }
 once_cell = { workspace = true }
 parquet = "53"
 parquetry = { git = "https://github.com/travisbrown/parquetry.git", branch = "topic/writer" }
+parquetry-sort = { git = "https://github.com/travisbrown/parquetry.git", branch = "topic/writer" }
 regex = { workspace = true }
 serde = { workspace = true }
 thiserror = { workspace = true }
