@@ -88,10 +88,15 @@ async fn main() -> Result<(), Error> {
             use parquet::file::properties::WriterProperties;
             use parquetry::Schema;
             let store = aib_store::items::ItemStore::new(input, level);
-            let file = std::fs::File::create(&output)?;
+            let file = std::io::BufWriter::new(std::fs::File::create(&output)?);
+
+            let sort_key = aib_store::parquet::item::Item::sort_key(&[parquetry::sort::Sort::new(
+                columns::SortColumn::Digest,
+            )])
+            .unwrap();
+
             let properties = WriterProperties::builder()
                 .set_writer_version(parquet::file::properties::WriterVersion::PARQUET_2_0)
-                .set_sorting_columns(Some(vec![columns::DIGEST.sorting()]))
                 .set_column_dictionary_enabled(columns::DIGEST.path(), false)
                 .set_column_dictionary_enabled(columns::CONTENT.path(), false)
                 .set_column_encoding(
@@ -112,8 +117,7 @@ async fn main() -> Result<(), Error> {
                 .set_column_statistics_enabled(
                     columns::CONTENT.path(),
                     parquet::file::properties::EnabledStatistics::None,
-                )
-                .build();
+                );
 
             let mut files = store
                 .entries(4)
@@ -128,7 +132,15 @@ async fn main() -> Result<(), Error> {
 
             files.sort_by_key(|entry| entry.digest);
 
-            let groups = files.into_iter().map(|entry| {
+            let sort_db = parquetry_sort::SortDb::open("tmp-db", sort_key).unwrap();
+
+            for entry in files.into_iter() {
+                let bytes = zstd::stream::decode_all(File::open(&entry.path).unwrap()).unwrap();
+                let item = Item::new(entry.digest.0, bytes).map_err(Error::from)?;
+                sort_db.insert(&item).unwrap();
+            }
+
+            /*let groups = files.into_iter().map(|entry| {
                 let bytes = zstd::stream::decode_all(File::open(&entry.path).unwrap()).unwrap();
                 let item = Item::new(entry.digest.0, bytes).map_err(Error::from);
                 item
@@ -137,13 +149,22 @@ async fn main() -> Result<(), Error> {
             let data = Item::write(
                 file,
                 properties,
-                512 * 1048 * 1048,
-                |item| item.content.len(),
+
                 false,
                 groups,
-            )?;
+            )?;*/
 
-            println!("{:?}", data);
+            let metadata = sort_db
+                .write(
+                    file,
+                    properties,
+                    2096 * 1048 * 1048,
+                    |item| item.content.len(),
+                    false,
+                )
+                .unwrap();
+
+            println!("{:?}", metadata);
         }
         Command::ParquetDump { input } => {
             /*use aib_store::item::Item;
