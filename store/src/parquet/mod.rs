@@ -1,5 +1,4 @@
 use aib_core::digest::Sha1Digest;
-use futures::io::Read;
 use parquet::{
     column::reader::ColumnReader,
     file::{
@@ -10,6 +9,7 @@ use parquet::{
 };
 
 pub mod item;
+pub mod read;
 pub mod write;
 
 pub fn read_parquet<R: ChunkReader + 'static>(

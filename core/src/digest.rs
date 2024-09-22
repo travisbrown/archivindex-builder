@@ -174,7 +174,7 @@ impl Serialize for Digest {
     }
 }
 
-#[derive(Clone, Copy, Debug, Eq, Ord, PartialEq, PartialOrd)]
+#[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
 pub struct Sha1Digest(pub [u8; 20]);
 
 impl Display for Sha1Digest {

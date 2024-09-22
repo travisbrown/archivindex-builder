@@ -178,9 +178,23 @@ async fn main() -> Result<(), Error> {
                 println!("{}: {}", digest, &content[0..10]);
             }*/
 
-            let total_values = aib_store::parquet::read_parquet(File::open(input)?).unwrap();
+            //let total_values = aib_store::parquet::read_parquet(File::open(input)?).unwrap();
 
-            log::info!("Total read: {}", total_values);
+            //log::info!("Total read: {}", total_values);
+
+            let target: aib_core::digest::Sha1Digest =
+                "ITQPQIXRSOTGSBHCX5LKZ26YENLPPXYT".parse().unwrap();
+            let targets = vec![target].into_iter().collect();
+
+            for result in aib_store::parquet::read::ParquetReader::new(
+                File::open(input)?,
+                Some(targets),
+                false,
+            )? {
+                let (digest, bytes) = result?;
+
+                println!("digest: {}, length: {}", digest, bytes.len());
+            }
         }
     }
 
@@ -199,6 +213,8 @@ pub enum Error {
     Store(#[from] aib_store::Error),
     #[error("Item store error")]
     ItemStore(#[from] aib_store::items::Error),
+    #[error("Item store Parquet error")]
+    ItemStoreParquet(#[from] aib_store::parquet::read::Error),
     #[error("Parquet error")]
     Parquet(#[from] parquet::errors::ParquetError),
     #[error("Parquetry error")]
