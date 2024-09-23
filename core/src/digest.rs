@@ -79,7 +79,7 @@ impl Default for Sha1Computer {
     }
 }
 
-#[derive(Clone, Debug, Eq, Ord, PartialEq, PartialOrd)]
+#[derive(Clone, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
 pub enum Digest {
     Valid(Sha1Digest),
     Invalid(String),

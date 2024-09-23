@@ -1,6 +1,5 @@
 use aib_core::digest::{Sha1Computer, Sha1Digest};
 use parquet::{
-    bloom_filter,
     column::reader::ColumnReader,
     data_type::{ByteArray, FixedLenByteArray},
     file::{
