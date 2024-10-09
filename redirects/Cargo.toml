@@ -11,7 +11,6 @@ cli-helpers = { workspace = true }
 data-encoding = "2.3"
 once_cell = { workspace = true }
 regex = { workspace = true }
-sha-1 = "0.10"
 thiserror = { workspace = true }
 tokio = { workspace = true }
 aib-core = { path = "../core/" }
