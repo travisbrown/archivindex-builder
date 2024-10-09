@@ -1,4 +1,4 @@
-use aib_core::digest::{compute_digest, Sha1Digest};
+use aib_core::digest::{Sha1Computer, Sha1Digest};
 use flate2::read::GzDecoder;
 use futures::{FutureExt, Stream, TryStreamExt};
 use once_cell::sync::Lazy;
@@ -68,7 +68,7 @@ impl Store {
             .map_ok(|(expected, path)| {
                 tokio::spawn(async {
                     let mut file = File::open(path)?;
-                    match compute_digest(&mut GzDecoder::new(&mut file)) {
+                    match Sha1Computer::compute_digest(&mut GzDecoder::new(&mut file)) {
                         Ok(actual) => Ok((expected, actual)),
                         Err(error) => Err(Error::from(error)),
                     }
@@ -160,7 +160,7 @@ impl Store {
                         Ok(None)
                     } else {
                         let mut file = File::open(path)?;
-                        let digest = compute_digest(&mut GzDecoder::new(&mut file))?;
+                        let digest = Sha1Computer::compute_digest(&mut GzDecoder::new(&mut file))?;
 
                         Ok(Some((
                             name.to_string(),

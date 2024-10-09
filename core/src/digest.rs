@@ -31,16 +31,16 @@ pub enum Error {
     Decoding(data_encoding::DecodePartial),
 }
 
-pub fn compute_digest<R: Read>(input: &mut R) -> std::io::Result<Sha1Digest> {
-    Sha1Computer::default().digest(input)
-}
-
 #[derive(Clone)]
 pub struct Sha1Computer {
     writer: Arc<Mutex<BufWriter<sha1::Sha1>>>,
 }
 
 impl Sha1Computer {
+    pub fn compute_digest<R: Read>(input: &mut R) -> std::io::Result<Sha1Digest> {
+        Sha1Computer::default().digest(input)
+    }
+
     /// Compute the SHA-1 hash for bytes read from a source.
     pub fn digest_bytes<R: Read>(&self, input: &mut R) -> std::io::Result<[u8; 20]> {
         let mut writer = self.writer.lock().unwrap();

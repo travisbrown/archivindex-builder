@@ -1,4 +1,4 @@
-use aib_core::digest::{compute_digest, Sha1Digest};
+use aib_core::digest::{Sha1Computer, Sha1Digest};
 use flate2::bufread::GzDecoder;
 use futures::{FutureExt, Stream, TryStreamExt};
 use std::fs::File;
@@ -203,7 +203,7 @@ impl ItemStore {
                         Ok(entry) => {
                             let file_digest = File::open(&path)
                                 .and_then(Decoder::new)
-                                .and_then(|mut reader| compute_digest(&mut reader))
+                                .and_then(|mut reader| Sha1Computer::compute_digest(&mut reader))
                                 .map_err(|error| Error::ValidationIo {
                                     entry: entry.clone(),
                                     error,

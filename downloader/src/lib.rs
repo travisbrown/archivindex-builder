@@ -86,7 +86,8 @@ impl Downloader {
 
                         let guess = aib_core::redirect::make_redirect_html(&info.url);
                         let mut guess_bytes = guess.as_bytes();
-                        let guess_digest = aib_core::digest::compute_digest(&mut guess_bytes)?;
+                        let guess_digest =
+                            aib_core::digest::Sha1Computer::compute_digest(&mut guess_bytes)?;
 
                         let mut valid_initial_content = true;
                         let mut valid_digest = true;
@@ -97,7 +98,7 @@ impl Downloader {
                             //log::warn!("Invalid guess, re-requesting");
                             let direct_bytes =
                                 self.client.get(&initial_url).send().await?.bytes().await?;
-                            let direct_digest = aib_core::digest::compute_digest(
+                            let direct_digest = aib_core::digest::Sha1Computer::compute_digest(
                                 &mut direct_bytes.clone().reader(),
                             )?;
                             valid_initial_content = false;
@@ -175,7 +176,8 @@ impl Downloader {
 
                         let guess = aib_core::redirect::make_redirect_html(&info.url);
                         let mut guess_bytes = guess.as_bytes();
-                        let guess_digest = aib_core::digest::compute_digest(&mut guess_bytes)?;
+                        let guess_digest =
+                            aib_core::digest::Sha1Computer::compute_digest(&mut guess_bytes)?;
 
                         let (content, valid_digest) = if guess_digest == expected_digest {
                             (guess, true)
@@ -183,7 +185,7 @@ impl Downloader {
                             //log::warn!("Invalid guess, re-requesting");
                             let direct_bytes =
                                 self.client.get(&initial_url).send().await?.bytes().await?;
-                            let direct_digest = aib_core::digest::compute_digest(
+                            let direct_digest = aib_core::digest::Sha1Computer::compute_digest(
                                 &mut direct_bytes.clone().reader(),
                             )?;
                             (
