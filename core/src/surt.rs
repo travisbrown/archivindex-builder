@@ -86,7 +86,8 @@ impl FromStr for Surt {
             }
 
             let path = s[domain.len() + 1..].to_string();
-            if path.chars().nth(0) != Some('/') {
+
+            if !path.starts_with('/') {
                 return Err(Error::InvalidSurt(s.to_string()));
             }
 
