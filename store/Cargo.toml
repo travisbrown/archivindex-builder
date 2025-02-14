@@ -15,9 +15,9 @@ data-encoding = "2.3"
 flate2 = "1"
 futures = { workspace = true }
 once_cell = { workspace = true }
-parquet = "53"
-parquetry = "0.12"
-parquetry-sort = "0.12"
+parquet = "54"
+parquetry = "0.15"
+parquetry-sort = "0.15"
 #parquetry = { git = "https://github.com/travisbrown/parquetry.git", branch = "topic/writer" }
 #parquetry-sort = { git = "https://github.com/travisbrown/parquetry.git", branch = "topic/writer" }
 regex = { workspace = true }
@@ -27,7 +27,7 @@ tokio = { workspace = true }
 zstd = { workspace = true }
 
 [build-dependencies]
-parquetry-gen = "0.12"
+parquetry-gen = "0.15"
 #parquetry-gen = { git = "https://github.com/travisbrown/parquetry.git", branch = "topic/writer" }
 
 [dev-dependencies]

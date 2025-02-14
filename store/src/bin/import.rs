@@ -184,12 +184,12 @@ async fn main() -> Result<(), Error> {
 
             let target: aib_core::digest::Sha1Digest =
                 "ITQPQIXRSOTGSBHCX5LKZ26YENLPPXYT".parse().unwrap();
-            //let targets = vec![target].into_iter().collect();
+            let targets = vec![target].into_iter().collect();
 
             for result in aib_store::parquet::read::ParquetReader::new(
                 File::open(input)?,
-                //Some(targets),
-                None,
+                Some(targets),
+                //None,
                 true,
             )? {
                 let (digest, bytes) = result?;

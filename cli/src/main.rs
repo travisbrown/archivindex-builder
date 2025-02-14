@@ -387,6 +387,27 @@ async fn main() -> Result<(), Error> {
 
             log::info!("Added {} entry successes", count);
         }
+        Command::Digest { input } => {
+            let mut bytes = std::fs::read(&input)?;
+            println!("{:?}", bytes.last());
+            bytes.push(b'\r');
+            bytes.push(b'\n');
+            bytes.push(b'0');
+            bytes.push(b'\r');
+            bytes.push(b'\n');
+            bytes.push(b'\r');
+            bytes.push(b'\n');
+            bytes.reverse();
+            bytes.push(b'\n');
+            bytes.push(b'\r');
+            bytes.push(b'4');
+            bytes.push(b'3');
+            bytes.push(b'4');
+            bytes.reverse();
+            let mut cursor = std::io::Cursor::new(&bytes);
+            let digest = aib_core::digest::Sha1Computer::compute_digest(&mut cursor)?;
+            println!("{}", digest);
+        }
     }
 
     Ok(())
@@ -550,5 +571,9 @@ enum Command {
         store: PathBuf,
         #[clap(long)]
         level: Option<i32>,
+    },
+    Digest {
+        #[clap(long)]
+        input: PathBuf,
     },
 }
